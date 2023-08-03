@@ -49,7 +49,7 @@ def generate_organization_api(
         report = org.generate_report()
         return {"organization_report": report}
 
-@app.get("/this.zip")
+@app.get("/main.zip")
 def zip_py_files():
 
     

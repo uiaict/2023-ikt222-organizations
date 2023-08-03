@@ -61,7 +61,7 @@
 
         await pyodide.runPythonAsync(`
             from pyodide.http import pyfetch
-            response = await pyfetch("${url}/this.zip")
+            response = await pyfetch("${url}")
             await response.unpack_archive()
       `);
         addToOutput("Ready!")
@@ -70,8 +70,15 @@
       }
 
       let pyodideReadyPromise = main();
-
-      let url = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+      
+      let url = ""
+      // Check if hostname contains github.io
+      if(window.location.host.includes("github.io")){
+        // If so, use the github.io url
+        url = "https://github.com/uiaict/2023-ikt222-organizations/archive/refs/heads/main.zip"
+      }else{
+        url = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '/this.zip');
+      }
 
 
       async function downloadAndUnpack() {
