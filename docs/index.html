@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+    <style>
+        .output-block {
+          background-color: #f8f8f8;
+          border: 1px solid #ddd;
+          padding: 15px;
+          margin-bottom: 10px;
+        }
+      </style>
+  </head>
+
+  <body class="container">
+    <h1>Organization Generator</h1>
+    <p class="lead">
+      This tool uses Python code to generate a simulated organization structure. You can configure various parameters to adjust the organization generation, including a random seed (for reproducible results), the number of buildings and rooms, and the output format (JSON or plain text).
+    </p>
+
+    <div class="form-group">
+      <label for="seed">Seed:</label>
+      <input type="number" class="form-control" id="seed" value="42">
+    </div>
+    <div class="form-group">
+      <label for="is_json">Output as JSON?</label>
+      <input type="checkbox" class="form-control" id="is_json">
+    </div>
+    <div class="form-group">
+      <label for="n_buildings">Number of Buildings:</label>
+      <input type="number" class="form-control" id="n_buildings" value="1">
+    </div>
+    <div class="form-group">
+      <label for="n_rooms">Number of Rooms:</label>
+      <input type="number" class="form-control" id="n_rooms" value="1">
+    </div>
+
+    <button class="btn btn-primary" onclick="evaluatePython()">Generate</button>
+    <br />
+    <br />
+    <div>Generated Organization:</div>
+    <div id="outputContainer"></div>
+
+    <script>
+      const outputContainer = document.getElementById("outputContainer");
+
+
+      function addToOutput(s) {
+        const output = document.createElement("pre");
+        output.textContent = s;
+        output.classList.add("output-block");
+        outputContainer.appendChild(output);
+      }
+    
+
+      addToOutput("Initializing...")
+
+      async function main() {
+        let pyodide = await loadPyodide();
+
+        await pyodide.runPythonAsync(`
+            from pyodide.http import pyfetch
+            response = await pyfetch("${url}/this.zip")
+            await response.unpack_archive()
+      `);
+        addToOutput("Ready!")
+
+        return pyodide;
+      }
+
+      let pyodideReadyPromise = main();
+
+      let url = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+
+
+      async function downloadAndUnpack() {
+        let pyodide = await pyodideReadyPromise;
+     
+      }
+
+      downloadAndUnpack();
+
+      async function evaluatePython() {
+        let pyodide = await pyodideReadyPromise;
+        generator = pyodide.pyimport("generator");
+        items = pyodide.pyimport("items");
+        peripherals_list = items.peripherals
+        servers_list = items.servers
+        services_list = items.services
+
+        let seed = document.getElementById("seed").value;
+        let is_json = document.getElementById("is_json").checked;
+        let n_buildings = document.getElementById("n_buildings").value;
+        let n_rooms = document.getElementById("n_rooms").value;
+
+        // CAst to int
+        seed = parseInt(seed)
+        n_buildings = parseInt(n_buildings)
+        n_rooms = parseInt(n_rooms)
+        
+
+        let org = generator.generate_organization(n_buildings, n_rooms, peripherals_list, servers_list, services_list, seed)
+
+        let report = ""
+        if(is_json){
+            report = org.generate_report_json()
+        }else{
+            report = org.generate_report()
+        }
+
+        addToOutput(report);
+
+      }
+    </script>
+  </body>
+</html>
