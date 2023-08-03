@@ -45,14 +45,6 @@
     <script>
       const outputContainer = document.getElementById("outputContainer");
 
-      let url = ""
-      // Check if hostname contains github.io
-      if(window.location.host.includes("github.io")){
-        // If so, use the github.io url
-        url = "https://github.com/uiaict/2023-ikt222-organizations/archive/refs/heads/main.zip"
-      }else{
-        url = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '/this.zip');
-      }
 
 
 
@@ -70,9 +62,23 @@
         let pyodide = await loadPyodide();
 
         await pyodide.runPythonAsync(`
-            from pyodide.http import pyfetch
-            response = await pyfetch("${url}")
-            await response.unpack_archive()
+          from pyodide.http import pyfetch
+          files = [
+            "generator.py",
+            "items.py",
+            "organization.py",
+            "room.py",
+            "server.py",
+            "service.py",
+            "peripheral.py",
+            "network.py",
+            "building.py",
+          ]
+
+          for file in files:
+            response = await pyfetch(file)
+            with open(file, "wb") as f:
+              f.write(await response.bytes())
       `);
         addToOutput("Ready!")
 

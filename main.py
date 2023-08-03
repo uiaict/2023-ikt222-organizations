@@ -70,7 +70,7 @@ def zip_py_files():
         raise HTTPException(status_code=500, detail="Error zipping files")
 
 
-app.mount("/", StaticFiles(directory="docs"), name="docs")
+app.mount("/", StaticFiles(directory="./"), name="docs")
 
 if __name__ == '__main__':
     import uvicorn
